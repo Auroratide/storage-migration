@@ -11,6 +11,7 @@ If people have data stored locally in the Github domain, then it'll get lost whe
 This script moves data into local storage.
 
 ```javascript
+const target = "poke5e"
 const hasMigrated = localStorage.getItem("migrated") != null
 if (!hasMigrated) {
    const iframe = document.createElement("iframe")
@@ -38,7 +39,7 @@ if (!hasMigrated) {
    iframe.style.clipPath = "inset(50%)"
    iframe.style.overflow = "hidden"
    iframe.style.left = "-9999px"
-   iframe.src = "http://localhost:3001/poke5e"
+   iframe.src = `https://auroratide.github.io/storage-migration/${target}`
 
    document.body.appendChild(iframe)
 }
