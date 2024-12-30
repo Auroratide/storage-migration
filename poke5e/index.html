@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+		<meta name="robots" content="noindex,nofollow" />
+		<script>
+			if (parent != null) {
+				const entriesToMigrate = Object.entries(localStorage)
+					.filter(([key]) => key === "trainers" || key.startsWith("write:"))
+	
+				parent.postMessage(entriesToMigrate, "https://poke5e.app")
+			}
+		</script>
+
+		<style>
+			body { font-family: sans-serif; }
+			img { inline-size: 100%; max-inline-size: 50em; }
+			code { font-family: monospace; font-size: 1.25em; }
+			figure { margin: 2em 0; }
+		</style>
+	</head>
+	<body>
+		<h1>Poke 5e Trainer Transfer</h1>
+		<p>The Poke 5e app moved from <strong>auroratide.github.io/poke5e</strong> to a new home, <strong>poke5e.app</strong>! I tried to make this move as painless as possible for you by automatically moving your trainer data from one location to the other. However, if you're here, then that probably didn't work for some reason.</p>
+		<p>No worries! You can copy the trainer IDs below into the Poke 5e app to get them back manually.</p>
+		<ul id="trainers"></ul>
+		<p id="no-trainers" style="color: oklch(35% 0.15 35);" hidden>Seems like you do not have any trainer data! If this is a mistake, please let me know by <a href="https://github.com/Auroratide/poke5e/issues/new">creating an issue</a>, and I'll do my best to help you recover your data.</p>
+		<h2>Where to put these keys</h2>
+		<figure>
+			<img src="./poke5e/trainer-id.webp" alt="Find by trainer ID on the Trainers List page" />
+			<figcaption>Trainer ID</figcaption>
+		</figure>
+		<figure>
+			<img src="./poke5e/access-key.webp" alt="Access Key button on a trainer's profile page" />
+			<figcaption>Access Key (if provided)</figcaption>
+		</figure>
+
+		<script>
+			const ul = document.querySelector("#trainers")
+			const trainers = localStorage.getItem("trainers")?.split(",") ?? []
+
+			trainers.forEach((trainer) => {
+				const li = document.createElement("li")
+				li.innerHTML = `<code>${trainer}</code>`
+
+				const accessKey = localStorage.getItem(`write:${trainer}`)
+				if (accessKey != null) {
+					li.innerHTML += ` (access key: <code>${accessKey}</code>)`
+				}
+
+				ul.appendChild(li)
+			})
+
+			if (trainers.length === 0) {
+				document.querySelector("#no-trainers")?.removeAttribute("hidden")
+			}
+		</script>
+	</body>
+</html>
