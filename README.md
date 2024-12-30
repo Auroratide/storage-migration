@@ -17,18 +17,16 @@ if (!hasMigrated) {
    const iframe = document.createElement("iframe")
 
    window.addEventListener("message", (event) => {
-      if (event.origin = "https://auroratide.github.io") {
-         console.log("Migrating data to new domain...")
+      if (event.origin !== "https://auroratide.github.io") return
+      if (!Array.isArray(event.data)) return
 
-         if (Array.isArray(event.data)) {
-            event.data.forEach(([key, value]) => {
-               localStorage.setItem(key, value)
-            })
+      console.log("Migrating data to new domain...")
+      event.data.forEach(([key, value]) => {
+         localStorage.setItem(key, value)
+      })
 
-            localStorage.setItem("migrated", "true")
-            console.log("...Done migrating!")
-         }
-      }
+      localStorage.setItem("migrated", "true")
+      console.log("...Done migrating!")
 
       iframe.remove()
    }, { once: true })
