@@ -9,6 +9,7 @@
 					.filter(([key]) => key === "trainers" || key.startsWith("write:"))
 	
 				console.log("found: ", entriesToMigrate)
+				console.log("storage? ", localStorage)
 				parent.postMessage(entriesToMigrate, "https://poke5e.app")
 			}
 		</script>
