@@ -8,6 +8,7 @@
 				const entriesToMigrate = Object.entries(localStorage)
 					.filter(([key]) => key === "trainers" || key.startsWith("write:"))
 	
+				console.log("found: ", entriesToMigrate)
 				parent.postMessage(entriesToMigrate, "https://poke5e.app")
 			}
 		</script>
