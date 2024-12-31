@@ -9,6 +9,7 @@
 					console.log("has access? ", hasAccess)
 					document.requestStorageAccess({ localStorage: true}).then((handle) => {
 						console.log("after access: ", handle)
+						console.log("after access 2: ", handle.localStorage)
 					}, (reason) => {
 						console.log("after failure: ", reason)
 					})
