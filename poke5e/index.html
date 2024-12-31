@@ -4,23 +4,29 @@
 		<title>Poke 5e Trainer Transfer</title>
 		<meta name="robots" content="noindex,nofollow" />
 		<script>
-			if (parent != null) {
-				document.hasStorageAccess().then((hasAccess) => {
-					console.log("has access? ", hasAccess)
-					return document.requestStorageAccess({ localStorage: true })
-				}).then((handle) => {
-					console.log("after access: ", handle)
-					console.log("after access 2: ", handle.localStorage)
-				}, (reason) => {
-					console.log("after failure: ", reason)
-				})
-
-				// const entriesToMigrate = Object.entries(localStorage)
-				// 	.filter(([key]) => key === "trainers" || key.startsWith("write:"))
+			function transferStorage(storage) {
+				const entriesToMigrate = Object.entries(storage)
+					.filter(([key]) => key === "trainers" || key.startsWith("write:"))
 	
-				// console.log("found: ", entriesToMigrate)
-				// console.log("storage? ", localStorage)
-				// parent.postMessage(entriesToMigrate, "https://poke5e.app")
+				console.log("found: ", entriesToMigrate)
+				console.log("storage? ", storage)
+				parent.postMessage(entriesToMigrate, "https://poke5e.app")
+			}
+
+			if (parent != null) {
+				if ("hasStorageAccess" in document) {
+					document.hasStorageAccess().then((hasAccess) => {
+						console.log("has access? ", hasAccess)
+						return document.requestStorageAccess({ localStorage: true })
+					}).then((handle) => {
+						console.log("after access 2: ", handle.localStorage)
+						transferStorage(handle.localStorage)
+					}, (reason) => {
+						console.log("after failure: ", reason)
+					})
+				} else {
+					transferStorage(localStorage)
+				}
 			}
 		</script>
 
