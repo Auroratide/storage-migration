@@ -5,8 +5,11 @@
 		<meta name="robots" content="noindex,nofollow" />
 		<script>
 			if (parent != null) {
-				document.requestStorageAccess({ localStorage: true}).then((handle) => {
-					console.log("after access: ", handle.localStorage)
+				document.hasStorageAccess().then((hasAccess) => {
+					console.log("has access? ", hasAccess)
+					document.requestStorageAccess({ localStorage: true}).then((handle) => {
+						console.log("after access: ", handle.localStorage)
+					})
 				})
 
 				const entriesToMigrate = Object.entries(localStorage)
