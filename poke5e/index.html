@@ -7,20 +7,20 @@
 			if (parent != null) {
 				document.hasStorageAccess().then((hasAccess) => {
 					console.log("has access? ", hasAccess)
-					document.requestStorageAccess({ localStorage: true}).then((handle) => {
-						console.log("after access: ", handle)
-						console.log("after access 2: ", handle.localStorage)
-					}, (reason) => {
-						console.log("after failure: ", reason)
-					})
+					return document.requestStorageAccess({ localStorage: true })
+				}).then((handle) => {
+					console.log("after access: ", handle)
+					console.log("after access 2: ", handle.localStorage)
+				}, (reason) => {
+					console.log("after failure: ", reason)
 				})
 
-				const entriesToMigrate = Object.entries(localStorage)
-					.filter(([key]) => key === "trainers" || key.startsWith("write:"))
+				// const entriesToMigrate = Object.entries(localStorage)
+				// 	.filter(([key]) => key === "trainers" || key.startsWith("write:"))
 	
-				console.log("found: ", entriesToMigrate)
-				console.log("storage? ", localStorage)
-				parent.postMessage(entriesToMigrate, "https://poke5e.app")
+				// console.log("found: ", entriesToMigrate)
+				// console.log("storage? ", localStorage)
+				// parent.postMessage(entriesToMigrate, "https://poke5e.app")
 			}
 		</script>
 
