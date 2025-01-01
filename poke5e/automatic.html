@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+		<title>Poke 5e Trainer Transfer</title>
+		<meta name="robots" content="noindex,nofollow" />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+		<style>
+			body {
+				font-family: 'Rubik', -apple-system, 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Noto Sans', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+			}
+
+			button {
+				font-family: 'Rubik', -apple-system, 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Noto Sans', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+				font-size: 1.25em;
+				position: relative;
+				border-radius: 1.5em;
+				border: none;
+				padding: 0.25em 0.75em;
+				cursor: pointer;
+				text-decoration: none;
+				background: oklch(27.45% 0.0208 293.39);
+				color: oklch(100% 0 0);
+			} button:focus, button:hover {
+				background: oklch(92.34% 0 0);
+				color: oklch(27.45% 0.0208 293.39);
+			}
+
+			.center { text-align: center; }
+
+			.loader {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				animation: fade 3s ease-in-out infinite;
+			}.loader[hidden] {
+				display: none;
+			} .icon {
+				--skin-local-stroke: oklch(27.45% 0.0208 293.39);
+				font-size: 1em;
+				width: 3em;
+				height: 3em;
+				animation: spin 2s linear infinite;
+			} .stroke {
+				fill: none;
+				stroke: var(--skin-local-stroke);
+				stroke-width: 8;
+			} .stroke.thin {
+				stroke-width: 5;
+			}
+
+			@keyframes spin {
+				0% { transform: rotate(0deg); }
+				100% { transform: rotate(360deg); }
+			}
+
+			@keyframes fade {
+				0% { opacity: 0.25; }
+				50% { opacity: 0.75; }
+				100% { opacity: 0.25; }
+			}
+		</style>
+	</head>
+	<body>
+		<p class="center">
+			<button id="transfer-button" hidden>Start Transfer</button>
+			<div id="loader" class="loader" hidden>
+				<div class="icon">
+					<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+						<title>Transfering...</title>
+						<circle class="stroke" cx="50" cy="50" r="40" />
+						<circle class="stroke thin" cx="50" cy="50" r="12.5" />
+						<line class="stroke thin" x1="62.5" y1="50" x2="90" y2="50" />
+						<line class="stroke thin" x1="37.5" y1="50" x2="10" y2="50" />
+					</svg>
+				</div>
+			</div>
+		</p>
+		<script>
+			function postMessage(payload) {
+				parent.postMessage(payload, "https://poke5e.app")
+			}
+
+			function transferStorage(storage) {
+				const entriesToMigrate = Object.entries(storage)
+					.filter(([key]) => key === "trainers" || key.startsWith("write:"))
+	
+				console.log("Sending: ", entriesToMigrate)
+
+				postMessage(entriesToMigrate)
+			}
+
+			async function hasStorageAccess() {
+				if (!document.requestStorageAccess) return true
+				if (await document.hasStorageAccess()) return true
+
+				try {
+					const permission = await navigator.permissions.query({ name: "storage-access" })
+
+					if (permission.state === "granted") {
+						await document.requestStorageAccess()
+						return true
+					} else if (permission.state === "prompt") {
+						return false
+					} else if (permission.state === "denied") {
+						console.log("Permission was explicitly denied?")
+						return false
+					}
+				} catch (error) {
+					console.warn(error)
+					return false
+				}
+
+				return false
+			}
+
+			async function manuallyTransfer() {
+				const button = document.querySelector("#transfer-button")
+				const loader = document.querySelector("#loader")
+				button.toggleAttribute("hidden", true)
+				loader.toggleAttribute("hidden", false)
+
+				const hasAccess = await hasStorageAccess()
+				if (!hasAccess) {
+					try {
+						await document.requestStorageAccess()
+					} catch (error) {
+						console.error(error)
+						postMessage("failed")
+
+						return
+					}
+				}
+
+				const handle = await document.requestStorageAccess({ localStorage: true })
+				transferStorage(handle.localStorage)
+			}
+
+			async function automaticallyTransfer() {
+				const hasAccess = await hasStorageAccess()
+				if (hasAccess) {
+					if (document.requestStorageAccess) {
+						const handle = await document.requestStorageAccess({ localStorage: true })
+						transferStorage(handle.localStorage)
+					} else {
+						transferStorage(localStorage)
+					}
+				} else {
+					console.log("Requires manual input to migrate data.")
+					const button = document.querySelector("#transfer-button")
+					button.addEventListener("click", manuallyTransfer)
+					button.removeAttribute("hidden")
+					postMessage("manual")
+				}
+			}
+
+			if (parent != null) {
+				automaticallyTransfer()
+			}
+		</script>
+	</body>
+</html>
